@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="icon" href="../../favicon.ico">
+
+<title>Justified Nav Template for Bootstrap</title>
+
+<!-- Bootstrap core CSS -->
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="../css/justified-nav.css" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="../css/theme.css" rel="stylesheet">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+<!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+<script src="../js/ie-emulation-modes-warning.js"></script>
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="../js/ie10-viewport-bug-workaround.js"></script>
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="masthead">
+			<h3 class="text-muted">Market Data Service Home</h3>
+			<ul class="nav nav-justified">
+				<li><a href="../">Services</a></li>
+				<li><a href="html/docs.html">Docs</a></li>
+				<li class="active"><a href="#">demos</a></li>
+			</ul>
+		</div>
+
+		<div class="page-header">
+			<h1>Services</h1>
+		</div>
+		<ul class="nav nav-tabs">
+			<li><a href="demo.html"><b>ImportDownloadService</b></a></li>
+			<li class="active"><a href="#">SummaryDataService</a></li>
+			<li><a href="demo-currency.html">CurrencyConvertService</a></li>
+		</ul>
+
+
+		<!-- Example row of columns -->
+
+		<div class="page-header">
+			<h2>Operation: summaryMarketData</h2>
+		</div>
+		<div>
+			<div class="page-header">
+				<h4>Request</h4>
+			</div>
+			<form class="contact" name="importForm" id="importForm" action="../servlet/summaryData" method="POST" >
+					<input class="form-control" type="text" name="eventSetId" placeholder="Enter eventSetId" /> 
+					<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
+			<div class="page-header">
+				<h4>Response</h4>
+			</div>
+			<div id="summaryResults" name="summaryResults" class="alert alert-success" role="alert" ></div>
+
+		</div>
+
+
+		<!-- Site footer -->
+		<div class="footer">
+			<p>&copy; DongyaoWu@UNSW 2014</p>
+		</div>
+
+	</div>
+	<!-- /container -->
+
+
+	<script type="text/javascript">
+	
+		$("#importForm").submit(function(e)
+				{
+				    var postData = $(this).serialize();
+				    var formURL = $(this).attr("action");
+				    $.ajax(
+				    {
+				        url : formURL,
+				        type: "POST",
+				        data : postData,
+				        dataType : 'text',
+				        success:function(data,textStatus, errorThrown) 
+				        {
+				        	document.getElementById("summaryResults").innerHTML =  data;
+				        },
+				        error: function(jqXHR, textStatus, errorThrown) 
+				        {
+				        	alert(errorThrown);     
+				        }
+				    });
+				    e.preventDefault(); //STOP default action
+				    e.unbind(); //unbind. to stop multiple form submit.
+				});
+		
+		
+        </script>
+	<!-- Placed at the end of the document so the pages load faster -->
+</body>
+</html>
