@@ -1,6 +1,7 @@
 package au.com.nicta.data.pipeline.core.executor
 
 import akka.actor.{Props, ActorSystem}
+import au.com.nicta.data.pipeline.core.server.SimplePipelineServer
 import com.typesafe.config.ConfigFactory
 
 /**

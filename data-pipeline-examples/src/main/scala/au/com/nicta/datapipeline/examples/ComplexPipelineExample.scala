@@ -69,12 +69,12 @@ object ComplexPipelineExample extends App{
   val nextP = pipeline ->: dataJoiner2
 
 
-  PipelineContext.pseudoRun(pipeline)
+//  PipelineContext.pseudoRun(pipeline)
 
 // other options:
 //    PipelineContext.explain(pipeline)
 //    PipelineContext.test(pipeline)
-//    PipelineContext.exec(pipeline)
+    PipelineContext.exec(pipeline)
 
 
 }

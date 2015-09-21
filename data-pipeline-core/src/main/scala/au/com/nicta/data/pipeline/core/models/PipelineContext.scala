@@ -4,6 +4,8 @@ import java.io.{InputStreamReader, BufferedReader}
 import java.util.concurrent.atomic.AtomicBoolean
 
 import au.com.nicta.data.pipeline.core.executor._
+import au.com.nicta.data.pipeline.core.server.SimplePipelineServer
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Lock
 
@@ -12,8 +14,6 @@ import scala.concurrent.Lock
  * Created by tiantian on 15/07/15.
  */
 object PipelineContext {
-  
-
 
   val isInit = new AtomicBoolean(false)
   val initLock = new Lock
@@ -54,11 +54,16 @@ object PipelineContext {
 
   def exec(pipe:Pipe[_,_]) = {
     //todo submit to a remote server
-    SimplePipeExecutor.execute(pipe, ExecutionOption.Run)
+    val exeId = SimplePipeExecutor.getHexTimestamp()
+    SimplePipeExecutor.execute(pipe, ExecutionOption.Run, exeId)
+    exeId
   }
 
-  def exec(pipes:Seq[Pipe[_,_]]) = {
-    SimplePipeExecutor.execute(pipes, ExecutionOption.Run, SimplePipeExecutor.getHexTimestamp())
+  def exec(pipes:Seq[Pipe[_,_]], pipelineServer:String = "localhost") = {
+    //todo submit to a remote server
+    val exeId = SimplePipeExecutor.getHexTimestamp()
+    SimplePipeExecutor.execute(pipes, ExecutionOption.Run, exeId)
+    exeId
   }
 
   def explain(pipe:Pipe[_,_]) = {

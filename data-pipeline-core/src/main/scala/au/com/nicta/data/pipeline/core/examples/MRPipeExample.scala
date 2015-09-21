@@ -16,7 +16,7 @@ import scala.collection.mutable
 object MRPipeExample extends App{
 
 
-    val pipe = new MRPipe(name = "mr-pipe", version = "0.0.1",
+    val pipe = MRPipe(name = "mr-pipe", version = "0.0.1",
       mapper = new WordCountMapper,
       reducer = new SumReducer,
       combiner = new SumReducer,
@@ -28,7 +28,7 @@ object MRPipeExample extends App{
 
 }
 
-class WordCountMapper extends Mapper[Any, Text, Text, IntWritable] {
+class WordCountMapper extends Mapper[Any, Text, Text, IntWritable] with Serializable{
 
   private val one = new IntWritable(1)
   private val word = new Text()
@@ -47,7 +47,7 @@ class WordCountMapper extends Mapper[Any, Text, Text, IntWritable] {
 /**
  * reducer of a MR job
  */
-class SumReducer extends Reducer[Text, IntWritable, Text, IntWritable] {
+class SumReducer extends Reducer[Text, IntWritable, Text, IntWritable] with Serializable{
 
   private val result = new IntWritable()
 

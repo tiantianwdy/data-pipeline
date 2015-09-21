@@ -51,13 +51,24 @@ object HistoryManager{
 
 case class PipeTrace(pipeName:String,
                      version:String,
-                     execTag:String,
-                     outputPath:String) extends Serializable
+                     author:String,
+                     dep:Seq[String],
+                     creatTime:Long,
+                     instances:Seq[String]) extends Serializable
 
-case class ExecutionTrace(pipeName:String,
+case class ExecutionTrace(taskId:String,
+                          pipeName:String,
                           version:String,
                           pipeClass:String,
                           execTag:String,
-                          taskId:String,
+                          inputPath:Seq[String],
                           outputPath:String,
+                          startTime:Long,
+                          endTime:Long,
                           status:String) extends Serializable
+
+case class PipelineTrace(pipelineName:String,
+                         instances:Map[String, PipelineDAG]
+                          ) extends Serializable
+
+case class PipelineDAG(nodes:Seq[String], links:Seq[String]) extends Serializable

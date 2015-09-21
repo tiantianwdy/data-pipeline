@@ -41,7 +41,9 @@ abstract class Pipe[I: ClassTag, O: ClassTag](val name: String,
   }
 
   private[pipeline] def inputAddress(executionTag:String):Seq[String] = {
-    inputPath.map(p => p + s"/$executionTag")
+    if(parents nonEmpty)
+      inputPath.map(p => p + s"/$executionTag")
+    else inputPath
   }
 
   private[pipeline] def execute()
@@ -130,7 +132,7 @@ abstract class Pipe[I: ClassTag, O: ClassTag](val name: String,
  * @tparam O
  */
 class SparkPipe[I:ClassTag, O:ClassTag]( name: String,
-                                         @transient val exec:SparkProc[I, O] ,
+                                         val exec:SparkProc[I, O] ,
                                          version:String = "",
                                          pipelineServer: String = PipeExecutionContext.DEFAULT_PIPELINE_SERVER,
                                          executionContext: String = PipeExecutionContext.SPARK_EXECUTION_CONTEXT,
@@ -179,25 +181,33 @@ class SparkPipe[I:ClassTag, O:ClassTag]( name: String,
  * @tparam KOUT
  * @tparam VOUT
  */
-class MRPipe[KIN:ClassTag, VIN:ClassTag, KOUT:ClassTag, VOUT:ClassTag] ( name: String,
-                                     val mapper:Mapper[KIN, VIN, KOUT, VOUT],
-                                     val combiner:Reducer[KOUT, VOUT, KOUT, VOUT] = null,
-                                     val reducer:Reducer[KOUT, VOUT, KOUT, VOUT] = null,
+class MRPipe_old[KIN:ClassTag, VIN:ClassTag, KOUT:ClassTag, VOUT:ClassTag] ( name: String,
+                                     mapper:Mapper[KIN, VIN, KOUT, VOUT],
+                                     combiner:Reducer[KOUT, VOUT, KOUT, VOUT] = null,
+                                     reducer:Reducer[KOUT, VOUT, KOUT, VOUT] = null,
                                      version:String = "",
                                      pipelineServer: String = PipeExecutionContext.DEFAULT_PIPELINE_SERVER,
                                      executionContext: String = PipeExecutionContext.HADOOP_EXECUTION_CONTEXT,
                                      inputProtocol: mutable.Buffer[String] = ArrayBuffer.empty[String],
                                      inputFormat: String = "text",
                                      outputProtocol: String = "hdfs",
-                                     outputFormat: String = "text") extends Pipe[(KIN,VIN),(KOUT,VOUT)](name, version, pipelineServer, executionContext, inputProtocol, inputFormat, outputProtocol, outputFormat) {
+                                     outputFormat: String = "text") extends Pipe[Any, Any](name, version, pipelineServer, executionContext, inputProtocol, inputFormat, outputProtocol, outputFormat) {
 
-  val mapKType = classTag[KIN].runtimeClass
 
-  val mapVType = classTag[VIN].runtimeClass
+  val mapperClassName = if(mapper ne null) mapper.getClass.getCanonicalName else null
 
-  val outKType = classTag[KOUT].runtimeClass
+  val reducerClassName = if(reducer ne null) reducer.getClass.getCanonicalName else null
 
-  val outVType = classTag[VOUT].runtimeClass
+  val combinatorClassName = if(combiner ne null) combiner.getClass.getCanonicalName else null
+
+  val mapKType = classTag[KIN].runtimeClass.getCanonicalName
+
+  val mapVType = classTag[VIN].runtimeClass.getCanonicalName
+
+  val outKType = classTag[KOUT].runtimeClass.getCanonicalName
+
+  val outVType = classTag[VOUT].runtimeClass.getCanonicalName
+
 
   override private[pipeline] def notify(status: String): Unit = ???
 
@@ -210,6 +220,68 @@ class MRPipe[KIN:ClassTag, VIN:ClassTag, KOUT:ClassTag, VOUT:ClassTag] ( name: S
       s"combiner: $combiner \n"
   }
 }
+
+class MRPipe(name: String,
+             val mapperClassName: String,
+             val reducerClassName: String = null,
+             val combinatorClassName: String = null,
+             val mapKType:String,
+             val mapVType:String,
+             val outKType:String,
+             val outVType:String,
+             version: String = "",
+             pipelineServer: String = PipeExecutionContext.DEFAULT_PIPELINE_SERVER,
+             executionContext: String = PipeExecutionContext.HADOOP_EXECUTION_CONTEXT,
+             inputProtocol: mutable.Buffer[String] = ArrayBuffer.empty[String],
+             inputFormat: String = "text",
+             outputProtocol: String = "hdfs",
+             outputFormat: String = "text") extends Pipe[Any, Any](name, version, pipelineServer, executionContext, inputProtocol, inputFormat, outputProtocol, outputFormat) {
+
+
+  override private[pipeline] def notify(status: String): Unit = ???
+
+  override private[pipeline] def execute(): Unit = PipelineContext.exec(this)
+
+  override def toString: String = {
+    super.toString + "\n" +
+      s"mapper: $mapperClassName \n" +
+      s"reducer: $reducerClassName \n" +
+      s"combiner: $combinatorClassName \n"
+  }
+}
+
+object MRPipe {
+
+  def apply[KIN:ClassTag, VIN:ClassTag, KOUT:ClassTag, VOUT:ClassTag] ( name: String,
+                                                                        mapper:Mapper[KIN, VIN, KOUT, VOUT],
+                                                                        combiner:Reducer[KOUT, VOUT, KOUT, VOUT] = null,
+                                                                        reducer:Reducer[KOUT, VOUT, KOUT, VOUT] = null,
+                                                                        version:String = "",
+                                                                        pipelineServer: String = PipeExecutionContext.DEFAULT_PIPELINE_SERVER,
+                                                                        executionContext: String = PipeExecutionContext.HADOOP_EXECUTION_CONTEXT,
+                                                                        inputProtocol: mutable.Buffer[String] = ArrayBuffer.empty[String],
+                                                                        inputFormat: String = "text",
+                                                                        outputProtocol: String = "hdfs",
+                                                                        outputFormat: String = "text"):MRPipe = {
+    val mapperClassName = if(mapper ne null) mapper.getClass.getCanonicalName else null
+    val reducerClassName = if(reducer ne null) reducer.getClass.getCanonicalName else null
+    val combinatorClassName = if(combiner ne null) combiner.getClass.getCanonicalName else null
+
+    val mapKType = classTag[KIN].runtimeClass.getCanonicalName
+    val mapVType = classTag[VIN].runtimeClass.getCanonicalName
+    val outKType = classTag[KOUT].runtimeClass.getCanonicalName
+    val outVType = classTag[VOUT].runtimeClass.getCanonicalName
+    new MRPipe(name,
+      mapperClassName,
+      reducerClassName,
+      combinatorClassName,
+      mapKType, mapVType,
+      outKType, outVType,
+      version,
+      pipelineServer, executionContext, inputProtocol, inputFormat, outputProtocol, outputProtocol)
+  }
+}
+
 
 /**
  * A shell pipe object

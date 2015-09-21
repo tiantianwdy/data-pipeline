@@ -20,7 +20,7 @@ class MultiPipeTest {
       inputPath =  mutable.Buffer("hdfs://127.0.0.1:9001/user/spark/benchmark/micro/rankings")
     )
 
-    val pipe2 = new MRPipe(name = "mr-pipe", version = "0.0.1",
+    val pipe2 = MRPipe(name = "mr-pipe", version = "0.0.1",
       mapper = new WordCountMapper,
       reducer = new SumReducer,
       combiner = new SumReducer

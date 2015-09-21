@@ -121,7 +121,7 @@ object SparkPipeEntry extends Serializable{
    *  this is the  entrance class that loaded by the launcher of pipeline server to execute a Spark pipe
    * @param args
    */
-  def main (args: Array[String]) {
+  def main (args: Array[String]) = try {
     if (args.length < 8) System.exit(1)
 
     val start = System.currentTimeMillis()
@@ -162,6 +162,11 @@ object SparkPipeEntry extends Serializable{
     AkkaCallbackEntry.sendCallBack(pipelineServer, PipeCompleteMsg(pipeName, version, taskId, "success", executionTag))
     System.exit(0)
 
+  } catch {
+    case ex:Throwable =>
+      ex.printStackTrace()
+//      AkkaCallbackEntry.sendCallBack(pipelineServer, PipeCompleteMsg(pipeName, version, taskId, "Failed", executionTag))
+      System.exit(0)
   }
 
 }

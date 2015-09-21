@@ -1,8 +1,9 @@
-package au.com.nicta.data.pipeline.core
+package au.com.nicta.data.pipeline.core.server
 
 import au.com.nicta.data.pipeline.core.executor.SimplePipeExecutor
-import au.com.nicta.data.pipeline.core.manager.HistoryManager
+import au.com.nicta.data.pipeline.core.manager.{DependencyManager, HistoryManager}
 import au.com.nicta.data.pipeline.core.messages._
+import au.com.nicta.data.pipeline.core.models.PipelineContext
 
 /**
  * Created by tiantian on 27/07/15.
@@ -11,7 +12,9 @@ trait PipelineServerBackend {
 
   def pipeCompleted(msg:PipeCompleteMsg)
 
-  def pipeSubmit(msg:PipeSubmitMsg)
+  def pipeDepSubmit(msg:PipeSubmitMsg): PipelineMsg
+
+  def pipelineJobSubmit(msg:PipelineJobMsg): PipelineMsg
 
   def getExecutionHistory(msg:QueryExecutionHistory): PipelineMsg
 
@@ -25,8 +28,15 @@ class PipelineServerBackendImpl extends PipelineServerBackend {
     SimplePipeExecutor.taskCompleted(msg)
   }
 
-  override def pipeSubmit(msg: PipeSubmitMsg): Unit = {
+  override def pipeDepSubmit(msg: PipeSubmitMsg): PipelineMsg = {
+    DependencyManager().submit(msg.name, msg.version, msg.depBytes)
+    SubmitRevMsg(msg.name, msg.version)
+  }
 
+
+  override def pipelineJobSubmit(msg: PipelineJobMsg): PipelineMsg = {
+    val exeId = PipelineContext.exec(msg.pipeDag, "localhost")
+    JobRevMsg(msg.piplineName, exeId, "Running")
   }
 
   override def getExecutionHistory(msg: QueryExecutionHistory): PipelineMsg = {
@@ -36,8 +46,7 @@ class PipelineServerBackendImpl extends PipelineServerBackend {
 
   override def getPipeHistory(msg: QueryPipeHistory): PipelineMsg = {
     require(msg.name ne null)
-    val res = if(msg.version != null && msg.version.nonEmpty)
-    {
+    val res = if(msg.version != null && msg.version.nonEmpty) {
       HistoryManager().getPipeTrace(msg.name, msg.version)
     } else {
       HistoryManager().getPipeTrace(msg.name).toSeq.flatMap(_._2)

@@ -37,7 +37,7 @@ class PipeDemo {
 
   @Test
   def testConstructingMRPipe(): Unit ={
-    val pipe = new MRPipe(name = "mr-pipe", version = "0.0.1",
+    val pipe = MRPipe(name = "mr-pipe", version = "0.0.1",
       mapper = new WordCountMapper,
       reducer = new SumReducer,
       combiner = new SumReducer,
@@ -45,6 +45,9 @@ class PipeDemo {
     )
     println(pipe.mapKType + " " + pipe.mapVType)
     println(pipe.outKType + " " + pipe.outVType)
+    println(pipe.mapperClassName)
+    println(pipe.reducerClassName)
+    println(pipe.combinatorClassName)
 //    MRPipeEntry.launch(pipe)
   }
 

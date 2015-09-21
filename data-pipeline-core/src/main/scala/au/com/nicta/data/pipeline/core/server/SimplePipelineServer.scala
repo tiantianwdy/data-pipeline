@@ -1,7 +1,6 @@
-package au.com.nicta.data.pipeline.core.executor
+package au.com.nicta.data.pipeline.core.server
 
-import akka.actor.{Props, ActorSystem, ActorLogging, Actor}
-import au.com.nicta.data.pipeline.core.{PipelineServerBackendImpl, PipelineServerBackend}
+import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import au.com.nicta.data.pipeline.core.messages._
 import com.typesafe.config.ConfigFactory
 
@@ -22,8 +21,9 @@ class SimplePipelineServer(val backend:PipelineServerBackend = new PipelineServe
       backend.pipeCompleted(m)
       sender() ! CompleteRevMsg(m.name, m.version, null)
     case m:PipeSubmitMsg =>
-      backend.pipeSubmit(m)
-      sender() ! SubmitRevMsg(m.name, m.version)
+      sender() ! backend.pipeDepSubmit(m)
+    case m:PipelineJobMsg =>
+      sender() ! backend.pipelineJobSubmit(m)
     case msg:QueryPipeHistory =>
       sender() ! backend.getPipeHistory(msg)
     case msg:QueryExecutionHistory =>

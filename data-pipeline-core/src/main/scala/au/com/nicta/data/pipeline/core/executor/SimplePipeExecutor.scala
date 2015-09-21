@@ -47,13 +47,17 @@ object SimplePipeExecutor {
 
     val id = getPipeId(pipe.name, pipe.version, executionId)
     val outputPath = NameService.getHDFSPath(pipe.name, pipe.version, executionId)
+    val timestamp = System.currentTimeMillis()
 
-    HistoryManager().addTrace(ExecutionTrace(pipe.name,
+    HistoryManager().addTrace(ExecutionTrace(id,
+      pipe.name,
       pipe.version,
       pipe.getClass.toString,
       executionId,
-      id,
+      pipe.inputPath,
       outputPath,
+      timestamp,
+      timestamp,
       "Running"))
 
     val task = PipeTask(id, pipe, executionId)
@@ -86,14 +90,24 @@ object SimplePipeExecutor {
   def taskCompleted(msg:PipeCompleteMsg): Boolean = {
     println(s"Pipe Task:${msg.taskId} completed successfully.")
     val outputPath = NameService.getHDFSPath(msg.name, msg.version, msg.executionTag)
+    val timestamp = System.currentTimeMillis()
+    val traces = HistoryManager().getExecutionTrace(msg.executionTag).filter(_.taskId == msg.taskId)
+    val trace = if(traces nonEmpty) {
+      traces.head.copy(endTime = timestamp, status = msg.status)
+    } else {
+      ExecutionTrace(msg.taskId,
+        msg.name,
+        msg.version,
+        msg.getClass.toString,
+        msg.executionTag,
+        Seq.empty[String],
+        outputPath,
+        timestamp,
+        timestamp,
+        msg.status)
+    }
 
-    HistoryManager().addTrace(ExecutionTrace(msg.name,
-      msg.version,
-      classOf[Pipe[_,_]].toString,
-      msg.executionTag,
-      msg.taskId,
-      outputPath,
-      msg.status))
+    HistoryManager().addTrace(trace)
 
     val promise = promiseMap.remove(msg.taskId)
     if(promise ne null){

@@ -8,7 +8,7 @@ import au.com.nicta.data.pipeline.core.models.{MRPipe, PipelineContext}
 import au.com.nicta.data.pipeline.io.NameService
 import org.apache.hadoop.conf.{Configuration, Configured}
 import org.apache.hadoop.fs.Path
-import org.apache.hadoop.mapreduce.Job
+import org.apache.hadoop.mapreduce.{Mapper, Reducer, Job}
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.util.{Tool, ToolRunner}
@@ -22,7 +22,7 @@ object MRPipeEntry {
   val MR_JOB_TRACKER_ADRESS = "local"
 
 
-  def launch(pipe: MRPipe[_, _, _, _], taskId:String, executionTag:String) = {
+  def launch(pipe: MRPipe, taskId:String, executionTag:String) = {
     val conf = new Configuration()
     conf.set("mapred.job.tracker", MR_JOB_TRACKER_ADRESS)
     conf.set("fs.default.name", "hdfs://127.0.0.1:9001")
@@ -38,20 +38,26 @@ object MRPipeEntry {
     } else pipe.inputPath
     println("input paths:" + inputPaths.mkString(","))
     val job = Job.getInstance(conf, pipe.name)
+    val mapperClass = Class.forName(pipe.mapperClassName).asInstanceOf[Class[Mapper[_,_,_,_]]]
+    val outKClass = Class.forName(pipe.outKType)
+    val outVClass = Class.forName(pipe.outVType)
+
     job.setJar(appJar)
 //    job.setJarByClass(pipe.mapper.getClass)
-    job.setMapperClass(pipe.mapper.getClass)
-    if(pipe.reducer ne null){
-      job.setReducerClass(pipe.reducer.getClass)
-      job.setOutputKeyClass(pipe.outKType)
-      job.setOutputValueClass(pipe.outVType)
+    job.setMapperClass(mapperClass)
+    if(pipe.reducerClassName ne null){
+      val reducerClass = Class.forName(pipe.reducerClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]
+      job.setReducerClass(reducerClass)
+      job.setOutputKeyClass(outKClass)
+      job.setOutputValueClass(outVClass)
     } else { // map only jobs
       job.setNumReduceTasks(0)
-      job.setMapOutputKeyClass(pipe.outKType)
-      job.setMapOutputValueClass(pipe.outVType)
+      job.setMapOutputKeyClass(outKClass)
+      job.setMapOutputValueClass(outVClass)
     }
-    if(pipe.combiner ne null){
-      job.setCombinerClass(pipe.combiner.getClass)
+    if(pipe.combinatorClassName ne null){
+      val combinerClass = Class.forName(pipe.combinatorClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]
+      job.setCombinerClass(combinerClass)
     }
 
     inputPaths.foreach (p =>

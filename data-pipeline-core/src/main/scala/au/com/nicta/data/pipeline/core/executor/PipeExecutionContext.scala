@@ -28,21 +28,8 @@ object PipeExecutionContext {
   def launch(pipe: Pipe[_,_], taskId:String, execTag:String) = {
     pipe match {
       case sp:SparkPipe[_,_] =>
-        SparkPipeEntry.launch(sp, taskId, execTag).waitFor()
-
-      case mp:MRPipe[_,_,_,_] =>
-        MRPipeEntry.launch(mp, taskId, execTag)
-
-      case shellPipe:ShellPipe =>
-        ShellEntry.launch(shellPipe, taskId, execTag)
-    }
-  }
-
-  def test(pipe:Pipe[_,_], taskId:String = "", execTag:String) = {
-
-    pipe match {
-      case sp:SparkPipe[_,_] =>
-        println(sp)
+//        SparkPipeEntry.launch(sp, taskId, execTag).waitFor()
+//        println(sp)
         val process = SparkPipeEntry.launch(sp, taskId, execTag)
         val in = new BufferedReader(new InputStreamReader(process.getErrorStream))
         var line:String = in.readLine()
@@ -53,7 +40,30 @@ object PipeExecutionContext {
         val status = process.waitFor()
         println(s"process exit with $status ..")
 
-      case mp:MRPipe[_,_,_,_] =>
+      case mp:MRPipe =>
+        println(MRPipeEntry.launch(mp, taskId, execTag))
+
+      case shellPipe:ShellPipe =>
+        ShellEntry.launch(shellPipe, taskId, execTag)
+    }
+  }
+
+  def test(pipe:Pipe[_,_], taskId:String = "", execTag:String) = {
+
+    pipe match {
+      case sp:SparkPipe[_,_] =>
+//        println(sp)
+        val process = SparkPipeEntry.launch(sp, taskId, execTag)
+        val in = new BufferedReader(new InputStreamReader(process.getErrorStream))
+        var line:String = in.readLine()
+        while(line!= null){
+          println(line)
+          line = in.readLine()
+        }
+        val status = process.waitFor()
+        println(s"process exit with $status ..")
+
+      case mp:MRPipe =>
         val res = MRPipeEntry.launch(mp,taskId, execTag)
         println(s"job history at: {$res}")
 
