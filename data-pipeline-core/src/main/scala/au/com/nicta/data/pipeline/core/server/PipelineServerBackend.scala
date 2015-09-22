@@ -40,14 +40,14 @@ class PipelineServerBackendImpl extends PipelineServerBackend {
   }
 
   override def getExecutionHistory(msg: QueryExecutionHistory): PipelineMsg = {
-    val res = HistoryManager().getExecutionTrace(msg.execTag)
+    val res = HistoryManager().getExecutionTraces(msg.execTag)
     QueryExecutionHistoryResp(msg.execTag, res)
   }
 
   override def getPipeHistory(msg: QueryPipeHistory): PipelineMsg = {
     require(msg.name ne null)
     val res = if(msg.version != null && msg.version.nonEmpty) {
-      HistoryManager().getPipeTrace(msg.name, msg.version)
+      HistoryManager().getPipeExecTrace(msg.name, msg.version)
     } else {
       HistoryManager().getPipeTrace(msg.name).toSeq.flatMap(_._2)
     }

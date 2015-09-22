@@ -8,7 +8,7 @@ import au.com.nicta.data.pipeline.core.executor.PipeExecutionContext
 /**
  * Created by tiantian on 10/08/15.
  */
-class DependencyManager(val dependencyBasePath:String) extends Serializable {
+class DependencyManager(val dependencyBasePath:String, val historyManager: HistoryManager) extends Serializable {
 
   def getAppPath(appName:String, version:String):String =  s"$dependencyBasePath/app/$appName/${version}/${appName}-${version}.jar"
 
@@ -23,7 +23,8 @@ class DependencyManager(val dependencyBasePath:String) extends Serializable {
       } else new File(getSharedDep).listFiles()
   }
 
-  def addDepFromLocal(appName:String, version:String, srcFile:String): Unit = {
+  //add dependency lib to a job from local
+  def addDepFromLocal(appName:String, version:String, srcFile:String, author:String = "defultUser"): Unit = {
     val src = Paths.get(srcFile)
     val target = Paths.get(getDepPath(appName, version))
     if(Files.notExists(target)){
@@ -31,14 +32,20 @@ class DependencyManager(val dependencyBasePath:String) extends Serializable {
       Files.createFile(target)
     }
     Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING)
+    val current =  System.currentTimeMillis()
+    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(srcFile), current, current))
   }
 
-  def addDep(appName:String, version:String, depName:String, depBytes:Array[Byte]): Unit = {
+  //add dependency lib to a lib
+  def addDep(appName:String, version:String, depName:String, depBytes:Array[Byte], author:String = "defultUser"): Unit = {
     val target = Paths.get(getDepPath(appName, version)+ "/" + depName)
     Files.write(target, depBytes, StandardOpenOption.CREATE)
+    val current =  System.currentTimeMillis()
+    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(target.toString), current, current))
   }
 
-  def submitFromLocal(appName:String, version:String, srcFile:String): Unit = {
+  // submit a job with version from local file
+  def submitFromLocal(appName:String, version:String, srcFile:String, author:String = "defultUser"): Unit = {
     val src = Paths.get(srcFile)
     val target = Paths.get(getAppPath(appName, version))
     if(Files.notExists(target)){
@@ -46,17 +53,22 @@ class DependencyManager(val dependencyBasePath:String) extends Serializable {
       Files.createFile(target)
     }
     Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING)
+    val current =  System.currentTimeMillis()
+    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(srcFile), current, current))
   }
 
-  def submit(appName:String, version:String, depBytes:Array[Byte])= {
+  // submit a job with bytes
+  def submit(appName:String, version:String, depBytes:Array[Byte], author:String = "defultUser")= {
     val target = Paths.get(getAppPath(appName, version))
     Files.write(target, depBytes, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)
+    val current =  System.currentTimeMillis()
+    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(target.toString), current, current))
   }
 }
 
 object DependencyManager extends Serializable{
 
-  lazy val dependencyManager = new DependencyManager(PipeExecutionContext.DEPENDENCY_HOME)
+  lazy val dependencyManager = new DependencyManager(PipeExecutionContext.DEPENDENCY_HOME, HistoryManager())
 
   def apply() ={
     dependencyManager

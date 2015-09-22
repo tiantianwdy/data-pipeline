@@ -1,6 +1,6 @@
 package au.com.nicta.data.pipeline.core.messages
 
-import au.com.nicta.data.pipeline.core.manager.ExecutionTrace
+import au.com.nicta.data.pipeline.core.manager.{PipeProvenance, ExecutionTrace}
 import au.com.nicta.data.pipeline.core.models.Pipe
 
 /**
@@ -22,12 +22,18 @@ case class PipelineJobMsg(piplineName:String, pipeDag:Seq[Pipe[_,_]]) extends Pi
 
 case class JobRevMsg(piplineName:String, exeId:String, status:String) extends PipelineMsg
 
+case class PipeFailureMsg(cause:Throwable) extends PipelineMsg
+
+
 case class QueryPipeHistory(name:String, version:String) extends PipelineMsg
 
-case class QueryPipeHistoryResp(name:String, version:String, results:Seq[ExecutionTrace]) extends PipelineMsg
+case class QueryPipeHistoryResp(name:String, version:String, results:Seq[(String, PipeProvenance)]) extends PipelineMsg
 
 case class QueryExecutionHistory(execTag:String) extends PipelineMsg
 
 case class QueryExecutionHistoryResp(execTag:String, results:Seq[ExecutionTrace]) extends PipelineMsg
 
-case class PipeFailureMsg(cause:Throwable) extends PipelineMsg
+case class QueryPipelineHistory(pipelineName:String, executionTag:String) extends PipelineMsg
+
+case class QueryPipelineHistoryResp(pipelineName:String, executionTag:String, results:Seq[(String, Seq[String])]) extends PipelineMsg
+
