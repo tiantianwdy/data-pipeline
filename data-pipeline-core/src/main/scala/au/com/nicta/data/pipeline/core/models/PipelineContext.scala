@@ -4,6 +4,8 @@ import java.io.{InputStreamReader, BufferedReader}
 import java.util.concurrent.atomic.AtomicBoolean
 
 import au.com.nicta.data.pipeline.core.executor._
+import au.com.nicta.data.pipeline.core.manager.HistoryManager
+import au.com.nicta.data.pipeline.core.messages.{JobRevMsg, PipelineJobMsg}
 import au.com.nicta.data.pipeline.core.server.SimplePipelineServer
 import com.typesafe.config.ConfigFactory
 
@@ -59,11 +61,21 @@ object PipelineContext {
     exeId
   }
 
-  def exec(pipes:Seq[Pipe[_,_]], pipelineServer:String = "localhost") = {
+  def exec(jobName:String, pipes:Seq[Pipe[_,_]], pipelineServer:String = "localhost") = {
     //todo submit to a remote server
-    val exeId = SimplePipeExecutor.getHexTimestamp()
-    SimplePipeExecutor.execute(pipes, ExecutionOption.Run, exeId)
-    exeId
+    if(pipelineServer == "localhost"){
+      val exeId = SimplePipeExecutor.getHexTimestamp()
+      HistoryManager().addPipelineInstance(jobName, exeId)
+      SimplePipeExecutor.execute(pipes, ExecutionOption.Run, exeId)
+      exeId
+    } else {
+      val job = PipelineJobMsg(jobName, pipes)
+      val res = AkkaCallbackEntry.sendCallBack(PipeExecutionContext.DEFAULT_PIPELINE_SERVER, job) match {
+        case msg:JobRevMsg => msg.exeId
+        case x:Any => ""
+      }
+      res
+    }
   }
 
   def explain(pipe:Pipe[_,_]) = {

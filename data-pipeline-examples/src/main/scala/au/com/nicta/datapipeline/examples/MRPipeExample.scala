@@ -16,7 +16,7 @@ import scala.collection.mutable
 object MRPipeExample extends App{
 
 
-  val pipe = new MRPipe(name = "mr-pipe", version = "0.0.1",
+  val pipe = MRPipe(name = "mr-pipe", version = "0.0.1",
     mapper = new WordCountMapper,
     reducer = new SumReducer,
     combiner = new SumReducer,

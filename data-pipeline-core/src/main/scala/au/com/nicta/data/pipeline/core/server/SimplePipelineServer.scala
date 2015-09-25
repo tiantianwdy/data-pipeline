@@ -28,6 +28,14 @@ class SimplePipelineServer(val backend:PipelineServerBackend = new PipelineServe
       sender() ! backend.getPipeHistory(msg)
     case msg:QueryExecutionHistory =>
       sender() ! backend.getExecutionHistory(msg)
+    case msg:QueryPipelineHistory =>
+      sender() ! backend.getPipelineHistory(msg)
+    case msg:QueryExecutionHistory =>
+      sender() ! backend.getExecutionHistory(msg)
+    case msg:QueryPipelineList =>
+      sender() ! backend.getAllPipelines()
+    case msg:QueryPipeList =>
+      sender() ! backend.getAllPipes()
     case x => log.error(s"Unknown msg $x")
   }
 }

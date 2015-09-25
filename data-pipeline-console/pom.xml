@@ -66,6 +66,28 @@
             <version>${jetty-version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-scala_2.10</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest_2.10</artifactId>
+                </exclusion>
+            </exclusions>
+            <version>2.6.0</version>
+        </dependency>
+
 
 <!--        <dependency>
             <groupId>org.restlet.jse</groupId>
@@ -123,6 +145,9 @@
                         <webAppSourceDirectory>src/main/webapp</webAppSourceDirectory>
                         <scanIntervalSeconds>10</scanIntervalSeconds>
                         <contextPath>/pipeline61</contextPath>
+                        <httpConnector>
+                            <port>8701</port>
+                        </httpConnector>
                         <stopKey>STOP</stopKey>
                         <stopPort>8005</stopPort>
                     </configuration>

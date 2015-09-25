@@ -2,12 +2,13 @@
 /**
   create a tree layout based on treeData and generate tips for each node in nodeInfo
 **/
-var colorArray = ["white", "green", "blue", "lightsteelblue", "orange", "red", "purple",  "black"]
-function createInteractiveTree(elem, treeData, nodeInfo) {
+var colorArray = ["white", "green", "blue", "lightsteelblue", "orange", "red", "purple",  "black"];
 
-   var margin = {top: 20, right: 20, bottom: 20, left: 80},
-   	width = 500 - margin.right - margin.left,
-   	height = 440 - margin.top - margin.bottom,
+function createInteractiveTree(elem, treeData, nodeInfo, treeWidth, treeHeight, leftMargin) {
+
+   var margin = {top: 20, right: 20, bottom: 20, left: leftMargin},
+   	width = treeWidth - margin.right - margin.left,
+   	height = treeHeight - margin.top - margin.bottom,
    	depthDistance = 120;
 
    var i = 0,
@@ -22,7 +23,7 @@ function createInteractiveTree(elem, treeData, nodeInfo) {
    var tree = d3.layout.tree()
    	.size([height, width])
    	.separation(function separation(a, b) {
-                  return (a.parent == b.parent ? 1 : 2) / a.depth;
+                  return (a.parent == b.parent ? 2 : 3) / a.depth;
                 });
 
    var diagonal = d3.svg.diagonal()
@@ -206,133 +207,4 @@ function createInteractiveTree(elem, treeData, nodeInfo) {
 
 
 
-var mockTreeData = [
-  {
-    "name": "Pipeline_ID",
-    "parent": "null",
-    "children": [
-      {
-        "name": "execution_1",
-        "parent": "Pipeline_ID",
-        "children": [
-          {
-            "name": "csvMapper#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "jsonMapper#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "textMapper#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "dataJoiner#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "featureExtractorSpark#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "featureExtractorPy#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "analysisSpark#0.0.1",
-            "parent": "execution_1"
-          },
-          {
-            "name": "analysisPy#0.0.1",
-            "parent": "execution_1"
-          }
-        ]
-      },
-      {
-        "name": "execution_2",
-        "parent": "Pipeline_ID",
-        "children": [
-                  {
-                    "name": "csvMapper#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "jsonMapper#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "textMapper#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "xmlMapper#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "dataJoiner#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "featureExtractorSpark#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "featureExtractorPy#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "analysisSpark#0.0.1",
-                    "parent": "execution_2"
-                  },
-                  {
-                    "name": "analysisPy#0.0.1",
-                    "parent": "execution_2"
-                  }
-                ]
-      },
-      {
-        "name": "execution_3",
-        "parent": "Pipeline_ID",
-        "children": [
-                  {
-                    "name": "csvMapper#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "jsonMapper#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "textMapper#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "xmlMapper#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "dataJoiner#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "featureExtractorSpark#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "featureExtractorPy#0.0.2",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "analysisSpark#0.0.1",
-                    "parent": "execution_3"
-                  },
-                  {
-                    "name": "analysisPy#0.0.1",
-                    "parent": "execution_3"
-                  }
-                ]
-      }
-    ]
-  }
-];
+

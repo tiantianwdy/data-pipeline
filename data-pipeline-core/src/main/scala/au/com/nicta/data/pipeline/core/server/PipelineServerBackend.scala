@@ -18,7 +18,13 @@ trait PipelineServerBackend {
 
   def getExecutionHistory(msg:QueryExecutionHistory): PipelineMsg
 
+  def getPipelineHistory(msg:QueryPipelineHistory):PipelineMsg
+
   def getPipeHistory(msg:QueryPipeHistory): PipelineMsg
+
+  def getAllPipelines():PipelineMsg
+
+  def getAllPipes():PipelineMsg
 
 }
 
@@ -35,7 +41,7 @@ class PipelineServerBackendImpl extends PipelineServerBackend {
 
 
   override def pipelineJobSubmit(msg: PipelineJobMsg): PipelineMsg = {
-    val exeId = PipelineContext.exec(msg.pipeDag, "localhost")
+    val exeId = PipelineContext.exec(msg.piplineName, msg.pipeDag, "localhost")
     JobRevMsg(msg.piplineName, exeId, "Running")
   }
 
@@ -47,10 +53,26 @@ class PipelineServerBackendImpl extends PipelineServerBackend {
   override def getPipeHistory(msg: QueryPipeHistory): PipelineMsg = {
     require(msg.name ne null)
     val res = if(msg.version != null && msg.version.nonEmpty) {
-      HistoryManager().getPipeExecTrace(msg.name, msg.version)
+      Seq(msg.version -> HistoryManager.getPipeProvenance(msg.name, msg.version))
     } else {
-      HistoryManager().getPipeTrace(msg.name).toSeq.flatMap(_._2)
+      HistoryManager.getPipeProvenance(msg.name).toSeq
     }
     QueryPipeHistoryResp(msg.name, msg.version, res)
+  }
+
+  override def getPipelineHistory(msg: QueryPipelineHistory): PipelineMsg = {
+    val res = HistoryManager.getPipelineProvenance(msg.pipelineName)
+    QueryPipelineHistoryResp(msg.pipelineName, msg.executionTag, res)
+
+  }
+
+  override def getAllPipelines(): PipelineMsg = {
+    val res = HistoryManager.getPipelineList()
+    QueryPipelineListResp(res)
+  }
+
+  override def getAllPipes(): PipelineMsg = {
+    val res = HistoryManager.getPipeList()
+    QueryPipeListResp(res)
   }
 }

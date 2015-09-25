@@ -2,6 +2,7 @@ package au.com.nicta.data.pipeline.core.manager
 
 import java.util.concurrent.{CopyOnWriteArrayList, ConcurrentHashMap}
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 
 /**
  * Created by tiantian on 20/08/15.
@@ -44,7 +45,7 @@ class HistoryManager {
     val historySeq =  pipeExecutionHistory.getOrElseUpdate(pipeId(eTrace.pipeName, eTrace.version), new CopyOnWriteArrayList[String])
     historySeq.add(eTrace.taskId)
     // save execution trace in execution history  
-    executionHistory.getOrElseUpdate(eTrace.execTag, new CopyOnWriteArrayList[String])
+    executionHistory.getOrElseUpdate(eTrace.execTag, new CopyOnWriteArrayList[String]).add(eTrace.taskId)
     executionTraceMap.put(eTrace.taskId, eTrace)
   }
   
@@ -55,7 +56,7 @@ class HistoryManager {
 
   def addUpdatePipe(pTrace:PipeTrace): Unit = {
     val id = pipeId(pTrace.pipeName, pTrace.version)
-    val updated = if(pipeHistoryMap.contains(id)){
+    val updated = if(pipeHistoryMap.containsKey(id)){
       val old = pipeHistoryMap.get(id)
       val depSeq = (old.dep ++ pTrace.dep).toSet[String]
       old.copy(lastUpdatedTime = pTrace.lastUpdatedTime, dep = depSeq.toSeq)
@@ -70,7 +71,7 @@ class HistoryManager {
 
   def getPipeExecTrace(pipeName:String, version:String):Seq[ExecutionTrace] = {
     val id = pipeId(pipeName, version)
-    if(pipeExecutionHistory.contains(id)) {
+    if(pipeExecutionHistory.containsKey(id)) {
       pipeExecutionHistory.get(id).map{
         tid => executionTraceMap.get(tid)
       }
@@ -93,7 +94,7 @@ class HistoryManager {
   }
   
   def getExecutionTraces(execTag:String):Seq[ExecutionTrace] = {
-    if(executionHistory.contains(execTag)){
+    if(executionHistory.containsKey(execTag)){
       val ids  = executionHistory.get(execTag)
       ids.map(id => executionTraceMap.get(id))
     }
@@ -102,6 +103,24 @@ class HistoryManager {
 
   def getPipelineExecutions(pipelineName:String) = {
     pipelineExecutionInstances.get(pipelineName)
+  }
+
+  def getAllPipeLines():Seq[String] = {
+    pipelineExecutionInstances.keys().toSeq
+  }
+
+  def getAllPipeLinesWithInstances():Seq[(String,Seq[String])] = {
+    pipelineExecutionInstances.toSeq.map(tuple => (tuple._1, tuple._2.toIndexedSeq))
+  }
+
+  def getAllPipes():Seq[String] = {
+    val res = mutable.Buffer.empty[String]
+    pipeHistoryMap.keys().toSeq.foreach{ k=>
+      val pipeName = k.split("#").apply(0)
+      if(!res.contains(pipeName))
+        res += pipeName
+    }
+    res.toSeq
   }
 
 }
@@ -131,7 +150,7 @@ object HistoryManager{
    *
    * @param pipeName
    */
-  def getPipeProvenance(pipeName:String) = Seq[(String, PipeProvenance)] = {
+  def getPipeProvenance(pipeName:String): Seq[(String, PipeProvenance)] = {
     historyManager.getPipeTrace(pipeName).map{t =>
       val instances = historyManager.getPipeExecTrace(t.pipeName, t.version)
       t.version -> PipeProvenance(t.pipeName, t.version, t.author, t.dep, t.creatTime, t.lastUpdatedTime, instances)
@@ -148,6 +167,14 @@ object HistoryManager{
     val t = historyManager.getPipeTrace(pipeName, version)
     val instances = historyManager.getPipeExecTrace(t.pipeName, t.version)
     PipeProvenance(t.pipeName, t.version, t.author, t.dep, t.creatTime, t.lastUpdatedTime, instances)
+  }
+
+  def getPipelineList():Seq[(String, Seq[String])] = {
+    historyManager.getAllPipeLinesWithInstances()
+  }
+
+  def getPipeList():Seq[String] = {
+    historyManager.getAllPipes()
   }
 
 

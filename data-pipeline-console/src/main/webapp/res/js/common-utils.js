@@ -6,7 +6,7 @@ function serialize($context) {
     return $context.serialize();
 }
 
-function ajaxSend(url, method, data, key, redirect){
+function ajaxSend(url, method, data, key, redirect, func){
     $.ajax({
         url: url,
         data: data,
@@ -20,54 +20,14 @@ function ajaxSend(url, method, data, key, redirect){
             console.log('failed to get AJAX data .');
         },
         success: function (result) {
-            data.result = result;
+//            alert(result);
+            func(result);
             if(redirect)
                 window.location.href = redirect;
         }
     });
 }
 
-
-function addTable(tableId, headings, table_data) {
-
-//            var myTableDiv = document.getElementById("metric_results")
-            var table = document.getElementById(tableId)
-
-
-//            table.border = '1'
-
-
-
-
-            //Create TABLE headings
-            var tableHead = document.createElement('thead')
-            table.appendChild(tableHead);
-            var tr = document.createElement('TR');
-            tableHead.appendChild(tr);
-            for (i = 0; i < headings.length; i++) {
-                var th = document.createElement('TH')
-//                th.width = '75';
-                th.appendChild(document.createTextNode(heading[i]));
-                tr.appendChild(th);
-
-            }
-
-            //TABLE Body
-            var tableBody = document.createElement('tbody')
-            table.appendChild(tableBody);
-
-            for (i = 0; i < table_data.length; i++) {
-                var tr = document.createElement('tr');
-                tableBody.appendChild(tr);
-                for (j = 0; j < table_data[i].length; j++) {
-                    var td = document.createElement('td')
-                    td.appendChild(document.createTextNode(stock[i][j]));
-                    tr.appendChild(td)
-                }
-            }
-
-
-        }
 
 function updateOrder(_id, _type, _amount, _additions, _state, redirect){
     var data = { id: _id,

@@ -9,6 +9,62 @@
         <welcome-file>/html/index.html</welcome-file>
     </welcome-file-list>
 
+    <servlet>
+        <servlet-name>pipeline-list-servlet</servlet-name>
+        <servlet-class>au.com.nicta.data.pipeline.console.controller.PipelineHistoryServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>pipe-list-servlet</servlet-name>
+        <servlet-class>au.com.nicta.data.pipeline.console.controller.PipeListServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>pipeline-execution-servlet</servlet-name>
+        <servlet-class>au.com.nicta.data.pipeline.console.controller.PipelineExecutionHistoryServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>pipe-history-servlet</servlet-name>
+        <servlet-class>au.com.nicta.data.pipeline.console.controller.PipeHistoryServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>execution-history-servlet</servlet-name>
+        <servlet-class>au.com.nicta.data.pipeline.console.controller.ExecutionHistoryServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>pipeline-list-servlet</servlet-name>
+        <url-pattern>/service/listPipelines/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>pipe-list-servlet</servlet-name>
+        <url-pattern>/service/listPipes/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>pipeline-execution-servlet</servlet-name>
+        <url-pattern>/service/execPipelines/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>execution-history-servlet</servlet-name>
+        <url-pattern>/service/execHistory/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>pipe-history-servlet</servlet-name>
+        <url-pattern>/service/pipeHistory/*</url-pattern>
+    </servlet-mapping>
+
 <!--
 
     <servlet>

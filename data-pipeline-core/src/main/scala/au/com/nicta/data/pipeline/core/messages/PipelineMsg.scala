@@ -37,3 +37,11 @@ case class QueryPipelineHistory(pipelineName:String, executionTag:String) extend
 
 case class QueryPipelineHistoryResp(pipelineName:String, executionTag:String, results:Seq[(String, Seq[String])]) extends PipelineMsg
 
+case class QueryPipeList() extends PipelineMsg
+
+case class QueryPipeListResp(results:Seq[String]) extends PipelineMsg
+
+case class QueryPipelineList() extends PipelineMsg
+
+case class QueryPipelineListResp(results:Seq[(String, Seq[String])]) extends PipelineMsg
+

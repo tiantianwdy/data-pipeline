@@ -45,8 +45,8 @@
             </plugins>
         </pluginManagement>
 
-        <sourceDirectory>src/main/scala</sourceDirectory>
-        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
 
         <resources>
             <resource>
@@ -143,7 +143,7 @@
                     <descriptors>
                         <descriptor>src/main/resources/assembly.xml</descriptor>
                     </descriptors>
-                    <finalName>data-pipeline-core</finalName>
+                    <!--<finalName>data-pipeline-core</finalName>-->
                     <appendAssemblyId>true</appendAssemblyId>
                 </configuration>
                 <executions>

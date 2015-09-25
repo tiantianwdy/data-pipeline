@@ -3,7 +3,7 @@ package au.com.nicta.datapipeline.example
 import java.nio.charset.Charset
 import java.nio.file.{Files, Paths}
 
-import au.com.nicta.datapipeline.examples.Rankings
+import au.com.nicta.data.pipeline.core.examples.Rankings
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.codehaus.jackson.map.ObjectMapper
 import org.junit.Test

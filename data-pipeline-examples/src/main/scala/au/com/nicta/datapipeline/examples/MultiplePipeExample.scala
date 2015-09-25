@@ -17,7 +17,7 @@ object MultiplePipeExample extends App{
     inputPath = mutable.Buffer("hdfs://127.0.0.1:9001/user/spark/benchmark/partial/rankings")
   )
 
-  val pipe2 = new MRPipe("MR-pipe-1.0.0",
+  val pipe2 = MRPipe("MR-pipe-1.0.0",
     new WordCountMapper,
     new SumReducer,
     new SumReducer

@@ -1,6 +1,7 @@
 package au.com.nicta.data.pipeline.core.manager
 
 import java.io.File
+import java.nio.file.attribute.{BasicFileAttributes, FileAttribute}
 import java.nio.file.{StandardOpenOption, StandardCopyOption, Paths, Files}
 
 import au.com.nicta.data.pipeline.core.executor.PipeExecutionContext
@@ -39,6 +40,10 @@ class DependencyManager(val dependencyBasePath:String, val historyManager: Histo
   //add dependency lib to a lib
   def addDep(appName:String, version:String, depName:String, depBytes:Array[Byte], author:String = "defultUser"): Unit = {
     val target = Paths.get(getDepPath(appName, version)+ "/" + depName)
+    if(Files.notExists(target)){
+      Files.createDirectories(target.getParent)
+      Files.createFile(target)
+    }
     Files.write(target, depBytes, StandardOpenOption.CREATE)
     val current =  System.currentTimeMillis()
     historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(target.toString), current, current))
@@ -60,7 +65,13 @@ class DependencyManager(val dependencyBasePath:String, val historyManager: Histo
   // submit a job with bytes
   def submit(appName:String, version:String, depBytes:Array[Byte], author:String = "defultUser")= {
     val target = Paths.get(getAppPath(appName, version))
-    Files.write(target, depBytes, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)
+    if(Files.exists(target)){
+      Files.write(target, depBytes, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)
+    } else {
+      if(Files.notExists(target.getParent))
+        Files.createDirectories(target.getParent)
+      Files.write(target, depBytes, StandardOpenOption.CREATE)
+    }
     val current =  System.currentTimeMillis()
     historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(target.toString), current, current))
   }
