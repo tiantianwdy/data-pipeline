@@ -5,6 +5,7 @@ import au.com.nicta.data.pipeline.core.examples._
 import au.com.nicta.data.pipeline.core.executor.{AkkaCallbackEntry, PipeExecutionContext}
 import au.com.nicta.data.pipeline.core.messages.PipelineJobMsg
 import au.com.nicta.data.pipeline.core.models._
+import au.com.nicta.data.pipeline.core.server.DependencyClient
 
 import scala.collection.mutable
 
@@ -55,7 +56,7 @@ object ComplexPipelineExample extends App {
                                                                            featureExtractorSpark :-> analysisSpark)
 
 
-  DependencySubmit.submitAllDependency(csvMapper,
+  submitAllDependency(csvMapper,
     jsonMapper,
     textMapper,
     dataJoiner,
@@ -75,6 +76,17 @@ object ComplexPipelineExample extends App {
 //    PipelineContext.test(pipeline)
 
 
+  def submitAllDependency(pipeList: Pipe[_, _]*): Unit = {
+    pipeList.foreach { pipe => pipe match {
+      case p: MRPipe =>
+        DependencyClient.submitPipe(p.name, p.version,
+          "/home/tiantian/Dev/workspace/data-pipeline/data-pipeline-examples/target/data-pipeline-examples.jar")
+      case p: SparkPipe[_, _] =>
+        DependencyClient.submitPipe(p.name, p.version,
+          "/home/tiantian/Dev/workspace/data-pipeline/data-pipeline-examples/target/data-pipeline-examples-0.0.1.jar")
+      }
+    }
+  }
 
 }
 
