@@ -28,7 +28,7 @@ object SparkPipeEntry extends Serializable{
 
 
   def launch(pipe:SparkPipe[_,_], taskId:String, executionTag:String): Process = launch(pipe.name,
-    pipe.version, pipe.app.getName, pipe.pipelineServer, pipe.executionContext, pipe.inputAddress(executionTag), taskId, executionTag)
+    pipe.version, pipe.appClass, pipe.pipelineServer, pipe.executionContext, pipe.inputAddress(executionTag), taskId, executionTag)
 
   /**
    *  launch spark app driver as a sub-process to execute the spark pipe
@@ -96,7 +96,7 @@ object SparkPipeEntry extends Serializable{
     val data = pipe.inputPath.map{ in =>
       dataAdapter.read(pipe.inputFormat, in)
     }
-
+//    val appCls = Class.forName(pipe.applicationClass).newInstance()
     val sparkApp = pipe.exec.asInstanceOf[SparkProc[I,O]]
     val rdds = mutable.Buffer.empty[RDD[I]]
     val dfs = mutable.Buffer.empty[DataFrame]

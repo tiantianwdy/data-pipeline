@@ -1,5 +1,7 @@
 package au.com.nicta.data.pipeline.core.executor
 
+import java.io.File
+import java.net.URLClassLoader
 import java.util.UUID
 
 import au.com.nicta.data.pipeline.core.manager.DependencyManager
@@ -21,7 +23,7 @@ object MRPipeEntry {
 
   val MR_JOB_TRACKER_ADRESS = "local"
 
-
+  @throws[Throwable]
   def launch(pipe: MRPipe, taskId:String, executionTag:String) = {
     val conf = new Configuration()
     conf.set("mapred.job.tracker", MR_JOB_TRACKER_ADRESS)
@@ -38,7 +40,11 @@ object MRPipeEntry {
     } else pipe.inputPath
     println("input paths:" + inputPaths.mkString(","))
     val job = Job.getInstance(conf, pipe.name)
-    val mapperClass = Class.forName(pipe.mapperClassName).asInstanceOf[Class[Mapper[_,_,_,_]]]
+    val parentLoader = Thread.currentThread().getContextClassLoader
+    val classLoader = new URLClassLoader(Array(new File(appJar).toURL), parentLoader)
+    val mapperClass = classLoader.loadClass(pipe.mapperClassName).asInstanceOf[Class[Mapper[_,_,_,_]]]
+//    val mapperClass = Class.forName(pipe.mapperClassName)
+//      .asInstanceOf[Class[Mapper[_,_,_,_]]]
     val outKClass = Class.forName(pipe.outKType)
     val outVClass = Class.forName(pipe.outVType)
 
@@ -46,7 +52,7 @@ object MRPipeEntry {
 //    job.setJarByClass(pipe.mapper.getClass)
     job.setMapperClass(mapperClass)
     if(pipe.reducerClassName ne null){
-      val reducerClass = Class.forName(pipe.reducerClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]
+      val reducerClass = classLoader.loadClass(pipe.reducerClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]
       job.setReducerClass(reducerClass)
       job.setOutputKeyClass(outKClass)
       job.setOutputValueClass(outVClass)
@@ -56,7 +62,7 @@ object MRPipeEntry {
       job.setMapOutputValueClass(outVClass)
     }
     if(pipe.combinatorClassName ne null){
-      val combinerClass = Class.forName(pipe.combinatorClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]
+      val combinerClass = classLoader.loadClass(pipe.combinatorClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]
       job.setCombinerClass(combinerClass)
     }
 

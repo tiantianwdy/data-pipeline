@@ -22,8 +22,8 @@ class PipeDemo {
        inputPath =  mutable.Buffer("hdfs://127.0.0.1:9001/user/spark/benchmark/partial/rankings")
      )
 
-     println(pipe1.app.getName)
-     val cls = Thread.currentThread().getContextClassLoader.loadClass(pipe1.app.getName)
+     println(pipe1.appClass)
+     val cls = Thread.currentThread().getContextClassLoader.loadClass(pipe1.appClass)
      println(cls)
 //     val constrcutors = cls.getConstructors()
 //     constrcutors.foreach(println(_))

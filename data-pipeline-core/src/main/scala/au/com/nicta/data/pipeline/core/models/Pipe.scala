@@ -132,6 +132,7 @@ abstract class Pipe[I: ClassTag, O: ClassTag](val name: String,
  * @tparam O
  */
 class SparkPipe[I:ClassTag, O:ClassTag]( name: String,
+                                         @transient
                                          val exec:SparkProc[I, O] ,
                                          version:String = "",
                                          pipelineServer: String = PipeExecutionContext.DEFAULT_PIPELINE_SERVER,
@@ -143,7 +144,7 @@ class SparkPipe[I:ClassTag, O:ClassTag]( name: String,
                                          ) extends Pipe[I, O](name, version, pipelineServer, executionContext, inputPath, inputFormat , output, outputFormat) {
 
  
-  val app = exec.getClass
+  val appClass = exec.getClass.getCanonicalName
 
   val inType = classTag[I]
 
