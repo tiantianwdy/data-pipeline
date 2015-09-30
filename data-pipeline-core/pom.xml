@@ -14,6 +14,30 @@
     <name>data-pipeline-core</name>
     <version>${project.parent.version}</version>
 
+    <profiles>
+        <profile>
+            <id>data-pipeline-dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <log.appender>STDOUT</log.appender>
+                <log.error.appender>STDOUT</log.error.appender>
+                <log.filePattern>../logs/data-pipeline-server.%d{yyyy-MM-dd}</log.filePattern>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>data-pipeline-product</id>
+            <properties>
+                <log.appender>FILE</log.appender>
+                <log.error.appender>FILE-ERROR</log.error.appender>
+                <log.filePattern>../logs/data-pipeline-server.%d{yyyy-MM-dd}</log.filePattern>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <build>
         <pluginManagement>
             <plugins>
