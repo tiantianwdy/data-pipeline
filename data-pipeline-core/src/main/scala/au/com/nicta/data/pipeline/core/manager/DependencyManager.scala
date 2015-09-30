@@ -3,13 +3,13 @@ package au.com.nicta.data.pipeline.core.manager
 import java.io.File
 import java.nio.file.attribute.{BasicFileAttributes, FileAttribute}
 import java.nio.file.{StandardOpenOption, StandardCopyOption, Paths, Files}
-
 import au.com.nicta.data.pipeline.core.executor.PipeExecutionContext
+import au.com.nicta.data.pipeline.core.utils.Logging
 
 /**
  * Created by tiantian on 10/08/15.
  */
-class DependencyManager(val dependencyBasePath:String, val historyManager: HistoryManager) extends Serializable {
+class DependencyManager(val dependencyBasePath:String, val historyManager: HistoryManager) extends Serializable with Logging{
 
   def getAppPath(appName:String, version:String):String =  s"$dependencyBasePath/app/$appName/${version}/${appName}-${version}.jar"
 
@@ -34,7 +34,8 @@ class DependencyManager(val dependencyBasePath:String, val historyManager: Histo
     }
     Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING)
     val current =  System.currentTimeMillis()
-    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(srcFile), current, current))
+    val trace = PipeTrace(appName, version, author, Seq(srcFile), current, current)
+    historyManager.addPipeTrace(trace)
   }
 
   //add dependency lib to a lib
@@ -46,7 +47,8 @@ class DependencyManager(val dependencyBasePath:String, val historyManager: Histo
     }
     Files.write(target, depBytes, StandardOpenOption.CREATE)
     val current =  System.currentTimeMillis()
-    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(target.toString), current, current))
+    val trace = PipeTrace(appName, version, author, Seq(target.toString), current, current)
+    historyManager.addPipeTrace(trace)
   }
 
   // submit a job with version from local file
@@ -59,7 +61,8 @@ class DependencyManager(val dependencyBasePath:String, val historyManager: Histo
     }
     Files.copy(src, target, StandardCopyOption.REPLACE_EXISTING)
     val current =  System.currentTimeMillis()
-    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(srcFile), current, current))
+    val trace = PipeTrace(appName, version, author, Seq(srcFile), current, current)
+    historyManager.addPipeTrace(trace)
   }
 
   // submit a job with bytes
@@ -73,7 +76,8 @@ class DependencyManager(val dependencyBasePath:String, val historyManager: Histo
       Files.write(target, depBytes, StandardOpenOption.CREATE)
     }
     val current =  System.currentTimeMillis()
-    historyManager.addPipeTrace(PipeTrace(appName, version, author, Seq(target.toString), current, current))
+    val trace = PipeTrace(appName, version, author, Seq(target.toString), current, current)
+    historyManager.addPipeTrace(trace)
   }
 }
 

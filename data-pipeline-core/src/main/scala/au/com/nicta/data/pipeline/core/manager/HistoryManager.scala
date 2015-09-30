@@ -1,13 +1,16 @@
 package au.com.nicta.data.pipeline.core.manager
 
 import java.util.concurrent.{CopyOnWriteArrayList, ConcurrentHashMap}
+
+import au.com.nicta.data.pipeline.core.utils.Logging
+
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
  * Created by tiantian on 20/08/15.
  */
-class HistoryManager {
+class HistoryManager extends Logging{
 
   /**
    * ${pipeName}#{$version} -> taskId(executionTrace id)
@@ -47,11 +50,13 @@ class HistoryManager {
     // save execution trace in execution history  
     executionHistory.getOrElseUpdate(eTrace.execTag, new CopyOnWriteArrayList[String]).add(eTrace.taskId)
     executionTraceMap.put(eTrace.taskId, eTrace)
+    log.info(eTrace.toString)
   }
   
   def addPipeTrace(pTrace:PipeTrace): Unit = {
     val id = pipeId(pTrace.pipeName, pTrace.version)
     pipeHistoryMap.put(id, pTrace)
+    log.info(pTrace.toString)
   }
 
   def addUpdatePipe(pTrace:PipeTrace): Unit = {
@@ -62,11 +67,13 @@ class HistoryManager {
       old.copy(lastUpdatedTime = pTrace.lastUpdatedTime, dep = depSeq.toSeq)
     } else pTrace
     pipeHistoryMap.put(id, updated)
+    log.info(updated.toString)
   }
 
   def addPipelineInstance(pipelineName:String, executionTag:String) = {
     val instanceMap = pipelineExecutionInstances.getOrElseUpdate(pipelineName, new CopyOnWriteArrayList[String])
     instanceMap.add(executionTag)
+    log.info(s"created execution instances: $executionTag")
   }
 
   def getPipeExecTrace(pipeName:String, version:String):Seq[ExecutionTrace] = {
