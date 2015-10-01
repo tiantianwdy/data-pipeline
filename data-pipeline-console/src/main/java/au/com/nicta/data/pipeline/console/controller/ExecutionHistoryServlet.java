@@ -1,7 +1,14 @@
 package au.com.nicta.data.pipeline.console.controller;
 
+import au.com.nicta.data.pipeline.core.executor.AkkaCallbackEntry;
+import au.com.nicta.data.pipeline.core.messages.QueryExecutionHistory;
+import au.com.nicta.data.pipeline.core.messages.QueryExecutionHistoryResp;
+import au.com.nicta.data.pipeline.core.messages.QueryPipeHistory;
+import au.com.nicta.data.pipeline.core.messages.QueryPipeHistoryResp;
+import au.com.nicta.data.pipeline.core.view.ViewAdapters;
 import au.com.nicta.data.pipeline.view.models.GraphVO;
 import au.com.nicta.data.pipeline.console.viewobjects.ObjectUtils;
+import au.com.nicta.data.pipeline.view.models.TreeVO;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,7 +25,10 @@ public class ExecutionHistoryServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //return pipeline history in JSON
         String executionTag = req.getParameter("executionTag");
-        GraphVO graph = ObjectUtils.getMockExecutionDAG(executionTag);
+//        GraphVO mockGraph = ObjectUtils.getMockExecutionDAG(executionTag);
+        QueryExecutionHistory msg = new QueryExecutionHistory(executionTag);
+        QueryExecutionHistoryResp results = (QueryExecutionHistoryResp) AkkaCallbackEntry.sendCallBack(ObjectUtils.PIPELINE_SERVER, msg);
+        GraphVO graph = ViewAdapters.executionHistoryToGraphVO(executionTag, results.results());
         String json = ObjectUtils.objectToJson(graph);
         resp.setContentType("application/json");
         resp.getWriter().write(json);

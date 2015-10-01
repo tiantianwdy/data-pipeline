@@ -149,18 +149,27 @@
 
     var data = "";
     ajaxSend("/service/listPipelines/", "post", data, "admin", null, function(d){
-        quickTree("pipelineTrees", d);
+        quickTree("pipelineTrees", d, treeClicked);
     });
 
-    var pipelineName = "ComplexPipeLine";
-    ajaxSend("/service/execPipelines/?pipelineName=" + pipelineName, "get", pipelineName, "admin", null, function(d){
-        createInteractiveTree("pipelineTreeDiv", [d], graphDataInfo.nodes, 540, 560, 120);
-    });
+    function treeClicked(node, depth){
+        if(depth == 1){
+            clear("pipelineTreeDiv")
+            var pipelineName = node;
+            ajaxSend("/service/execPipelines/?pipelineName=" + pipelineName, "get", pipelineName, "admin", null, function(d){
+                createInteractiveTree("pipelineTreeDiv", [d], graphDataInfo.nodes, 540, 560, 120);
+            });
+        } else if(depth == 2) {
+            clear("dagDiv")
+            var executionTag = node;
+            ajaxSend("/service/execHistory/?executionTag=" + executionTag, "get", executionTag, "admin", null, function(d){
+                createDAG("dagDiv", d);
+            });
+        }
+    }
 
-    var executionTag = "15001c9e8a0";
-    ajaxSend("/service/execHistory/?executionTag=" + executionTag, "get", executionTag, "admin", null, function(d){
-        createDAG("dagDiv", d);
-    });
+
+
 
     //addTable("task-table", heading, stock)
     //createDAG("dagDiv", graphData)

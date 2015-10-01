@@ -55,10 +55,10 @@ function quickTree(elemId, tree_data, func) {
 //            style.className += "nav-header";
             treeNode.appendChild(style)
             style.appendChild(document.createTextNode(data.name))
-            treeNode.onClick = function(e){
-              alert("clicked");
-              nodeOnClick(e, depth);
-            }
+            $(treeNode).on("click", function(){
+//              alert("clicked");
+              nodeOnClick(data.name, depth);
+            });
             if(data.children){
 //                treeNode.className += "open";
                 for(var i=0; i<data.children.length; i++){
@@ -77,15 +77,14 @@ function quickTree(elemId, tree_data, func) {
     }
 
     function nodeOnClick(event, depth){
-        var target = getEventTarget(event);
-        alert(target.innerHTML);
-        alert(depth);
-//        func(target, depth);
+        func(event, depth);
     }
 
 
 }
 
-
+function clear(elementId){
+    document.getElementById(elementId).innerHTML = ""
+}
 
 

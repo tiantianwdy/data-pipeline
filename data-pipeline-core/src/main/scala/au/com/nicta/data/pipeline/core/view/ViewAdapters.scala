@@ -1,7 +1,11 @@
 package au.com.nicta.data.pipeline.core.view
 
-import au.com.nicta.data.pipeline.core.manager.PipeProvenance
-import au.com.nicta.data.pipeline.view.models.TreeVO
+import java.nio.file.{Paths, Path}
+
+import au.com.nicta.data.pipeline.core.manager.{ExecutionTrace, PipeProvenance}
+import au.com.nicta.data.pipeline.view.models.{Link, PipeNode, GraphVO, TreeVO}
+
+import scala.collection.mutable
 
 /**
  * Created by tiantian on 25/09/15.
@@ -67,6 +71,47 @@ object ViewAdapters {
     val treeRoot = new TreeVO("All Pipes")
     data.foreach(p=> treeRoot.addChild(new TreeVO(p)))
     treeRoot
+  }
+
+
+  def executionHistoryToGraphVO(exeTag:String, res:Seq[ExecutionTrace]):GraphVO ={
+    val graph = new GraphVO
+    val nodes = mutable.Buffer.empty[PipeNode]
+    res.foreach{trace =>
+      val node = new PipeNode(trace.pipeName, trace.version)
+      if(!containsNode(trace.pipeName, trace.version, nodes)){
+        nodes += node
+        graph.addNodes(node)
+      }
+    }
+    res.foreach{trace =>
+      trace.inputPath.foreach { str =>
+        val path = Paths.get(str)
+        val version = getName(path)
+        val parentName = getName(path.getParent)
+        val target = indexOfNode(parentName, version, nodes)
+        if(target >= 0){
+          val source = indexOfNode(trace.pipeName, trace.version, nodes)
+          graph.addLink(new Link(source, target))
+        }
+      }
+    }
+    graph
+  }
+
+  def getName(path:Path):String = {
+    path.toFile.getName
+  }
+
+  def indexOfNode(pipeName:String, version:String, nodes:Seq[PipeNode]):Int = {
+    nodes.find(_.getName == s"$pipeName#$version") match {
+      case Some(n) => nodes.indexOf(n)
+      case None => -1
+    }
+  }
+
+  def containsNode(pipeName:String, version:String, nodes:Seq[PipeNode]):Boolean = {
+    nodes.exists(_.getName == s"$pipeName#$version")
   }
 
 }

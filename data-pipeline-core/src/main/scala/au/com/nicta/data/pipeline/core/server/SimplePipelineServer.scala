@@ -30,8 +30,6 @@ class SimplePipelineServer(val backend:PipelineServerBackend = new PipelineServe
       sender() ! backend.getExecutionHistory(msg)
     case msg:QueryPipelineHistory =>
       sender() ! backend.getPipelineHistory(msg)
-    case msg:QueryExecutionHistory =>
-      sender() ! backend.getExecutionHistory(msg)
     case msg:QueryPipelineList =>
       sender() ! backend.getAllPipelines()
     case msg:QueryPipeList =>

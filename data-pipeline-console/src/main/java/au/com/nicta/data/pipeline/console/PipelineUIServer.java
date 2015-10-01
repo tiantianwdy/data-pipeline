@@ -1,9 +1,6 @@
 package au.com.nicta.data.pipeline.console;
 
-import com.sun.jersey.server.impl.application.WebApplicationContext;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import javax.servlet.ServletException;
