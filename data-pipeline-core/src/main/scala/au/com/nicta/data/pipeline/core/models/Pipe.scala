@@ -195,11 +195,11 @@ class MRPipe_old[KIN:ClassTag, VIN:ClassTag, KOUT:ClassTag, VOUT:ClassTag] ( nam
                                      outputFormat: String = "text") extends Pipe[Any, Any](name, version, pipelineServer, executionContext, inputProtocol, inputFormat, outputProtocol, outputFormat) {
 
 
-  val mapperClassName = if(mapper ne null) mapper.getClass.getCanonicalName else null
+  val mapperClassName = if(mapper ne null) mapper.getClass.getName else null
 
-  val reducerClassName = if(reducer ne null) reducer.getClass.getCanonicalName else null
+  val reducerClassName = if(reducer ne null) reducer.getClass.getName else null
 
-  val combinatorClassName = if(combiner ne null) combiner.getClass.getCanonicalName else null
+  val combinatorClassName = if(combiner ne null) combiner.getClass.getName else null
 
   val mapKType = classTag[KIN].runtimeClass.getCanonicalName
 

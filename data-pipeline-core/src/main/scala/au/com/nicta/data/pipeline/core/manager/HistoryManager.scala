@@ -3,6 +3,7 @@ package au.com.nicta.data.pipeline.core.manager
 import java.util.concurrent.{CopyOnWriteArrayList, ConcurrentHashMap}
 
 import au.com.nicta.data.pipeline.core.utils.Logging
+import au.com.nicta.data.pipeline.view.models.ExecutionVO
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -146,10 +147,13 @@ object HistoryManager{
    * @param pipelineName
    * @return
    */
-  def getPipelineProvenance(pipelineName:String):Seq[(String,Seq[String])] = {
+  def getPipelineProvenance(pipelineName:String):Seq[(String,Seq[(String, Int)])] = {
     historyManager.getPipelineExecutions(pipelineName).map { exeId =>
-      val traceIds = historyManager.getExecutionTraces(exeId).map(t => historyManager.pipeId(t.pipeName, t.version))
-      exeId -> (traceIds)
+      val traces = historyManager.getExecutionTraces(exeId).map { t =>
+        val group = ExecutionVO.getGroup(t.status)
+        (historyManager.pipeId(t.pipeName, t.version), group.toInt)
+      }
+      exeId -> (traces)
     }
   }
 

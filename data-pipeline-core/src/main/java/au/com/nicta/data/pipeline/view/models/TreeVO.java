@@ -9,6 +9,7 @@ import java.util.List;
 public class TreeVO {
 
     private String name ;
+    private Integer group;
     private List<TreeVO> children = null;
 
     public TreeVO() {
@@ -19,11 +20,28 @@ public class TreeVO {
         this(name, new ArrayList<TreeVO>());
     }
 
+    public TreeVO(String name, Integer group) {
+        this(name, group, new ArrayList<TreeVO>());
+    }
+
     public TreeVO(String name, List<TreeVO> children) {
         this.name = name;
         this.children = children;
     }
 
+    public TreeVO(String name, Integer group, List<TreeVO> children) {
+        this.name = name;
+        this.group = group;
+        this.children = children;
+    }
+
+    public Integer getGroup() {
+        return group;
+    }
+
+    public void setGroup(Integer group) {
+        this.group = group;
+    }
 
     public String getName() {
         return name;

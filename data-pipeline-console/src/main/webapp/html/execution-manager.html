@@ -127,6 +127,7 @@
 
 
 <script type="text/javascript">
+
     var heading = new Array();
     heading[0] = "ID"
     heading[1] = "PipeName"
@@ -134,17 +135,6 @@
     heading[3] = "parents"
     heading[4] = "Time"
     heading[5] = "Status"
-
-    var stock = new Array()
-    stock[0] = new Array("1", "textMapper", "0.0.1", "None", "85.81", "Completed")
-    stock[1] = new Array("2", "jsonMapper", "0.0.1", "None", "85.81", "Running")
-    stock[2] = new Array("3", "csvMapper",  "0.0.1", "None", "85.81", "Running")
-    stock[3] = new Array("4", "dataJoiner", "0.0.1", "textMapper; jsonMapper; csvMapper", "85.81", "Waiting")
-    stock[4] = new Array("5", "featureExtractorPy", "0.0.1", "dataJoiner", "85.81", "Waiting")
-    stock[5] = new Array("6", "featureExtractorSpark", "0.0.1", "dataJoiner", "85.81", "Waiting")
-    stock[6] = new Array("7", "analysisPy", "0.0.1", "featureExtractorPy", "85.81", "Waiting")
-    stock[7] = new Array("8", "analysisSpark", "0.0.1", "featureExtractorSpark", "85.81", "Waiting")
-
 
 
     var data = "";
@@ -154,16 +144,20 @@
 
     function treeClicked(node, depth){
         if(depth == 1){
-            clear("pipelineTreeDiv")
+            clear("pipelineTreeDiv");
             var pipelineName = node;
             ajaxSend("/service/execPipelines/?pipelineName=" + pipelineName, "get", pipelineName, "admin", null, function(d){
                 createInteractiveTree("pipelineTreeDiv", [d], graphDataInfo.nodes, 540, 560, 120);
             });
         } else if(depth == 2) {
-            clear("dagDiv")
+            clear("dagDiv");
             var executionTag = node;
             ajaxSend("/service/execHistory/?executionTag=" + executionTag, "get", executionTag, "admin", null, function(d){
                 createDAG("dagDiv", d);
+            });
+            clear("task-table");
+            ajaxSend("/service/execDAG/?executionTag=" + executionTag, "get", executionTag, "admin", null, function(d){
+                addTable("task-table", heading, d)
             });
         }
     }

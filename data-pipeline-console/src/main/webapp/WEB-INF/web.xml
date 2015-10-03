@@ -39,6 +39,12 @@
         <load-on-startup>2</load-on-startup>
     </servlet>
 
+    <servlet>
+        <servlet-name>execution-dag-servlet</servlet-name>
+        <servlet-class>au.com.nicta.data.pipeline.console.controller.ExecutionDAGServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
 
     <servlet-mapping>
         <servlet-name>pipeline-list-servlet</servlet-name>
@@ -63,6 +69,11 @@
     <servlet-mapping>
         <servlet-name>pipe-history-servlet</servlet-name>
         <url-pattern>/service/pipeHistory/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>execution-dag-servlet</servlet-name>
+        <url-pattern>/service/execDAG/*</url-pattern>
     </servlet-mapping>
 
 <!--

@@ -1,7 +1,7 @@
 package au.com.nicta.data.pipeline.core.executor
 
 import java.io.File
-import java.net.URLClassLoader
+import java.net.{URL, URLClassLoader}
 import java.util.UUID
 
 import au.com.nicta.data.pipeline.core.manager.DependencyManager
@@ -40,8 +40,11 @@ object MRPipeEntry {
     } else pipe.inputPath
     println("input paths:" + inputPaths.mkString(","))
     val job = Job.getInstance(conf, pipe.name)
+    val appFile = new File(appJar)
+    require(appFile.exists())
     val parentLoader = Thread.currentThread().getContextClassLoader
-    val classLoader = new URLClassLoader(Array(new File(appJar).toURL), parentLoader)
+    val classLoader = new URLClassLoader(Array(appFile.toURL), parentLoader)
+    Thread.currentThread().setContextClassLoader(classLoader)
     val mapperClass = classLoader.loadClass(pipe.mapperClassName).asInstanceOf[Class[Mapper[_,_,_,_]]]
 //    val mapperClass = Class.forName(pipe.mapperClassName)
 //      .asInstanceOf[Class[Mapper[_,_,_,_]]]
@@ -49,7 +52,7 @@ object MRPipeEntry {
     val outVClass = Class.forName(pipe.outVType)
 
     job.setJar(appJar)
-//    job.setJarByClass(pipe.mapper.getClass)
+//    job.setJarByClass(mapperClass)
     job.setMapperClass(mapperClass)
     if(pipe.reducerClassName ne null){
       val reducerClass = classLoader.loadClass(pipe.reducerClassName).asInstanceOf[Class[Reducer[_,_,_,_]]]

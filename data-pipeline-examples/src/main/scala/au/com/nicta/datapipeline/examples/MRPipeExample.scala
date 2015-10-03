@@ -4,6 +4,7 @@ import java.lang
 import java.lang.Iterable
 import java.util.StringTokenizer
 
+import au.com.nicta.data.pipeline.core.executor.PipeExecutionContext
 import au.com.nicta.data.pipeline.core.models.{PipelineContext, MRPipe}
 import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.hadoop.mapreduce.{Mapper, Reducer}
@@ -16,14 +17,20 @@ import scala.collection.mutable
 object MRPipeExample extends App{
 
 
-  val pipe = MRPipe(name = "mr-pipe", version = "0.0.1",
+  val pipe = MRPipe(name = "mr-pipe", version = "0.0.2",
     mapper = new WordCountMapper,
     reducer = new SumReducer,
     combiner = new SumReducer,
     inputProtocol = mutable.Buffer("hdfs://127.0.0.1:9001/user/spark/benchmark/micro/rankings")
   )
 
-  PipelineContext.test(pipe)
+  DependencySubmit.submitAllDependency(pipe)
+
+  val msg = PipelineContext.exec("simple", Seq(pipe), PipeExecutionContext.DEFAULT_PIPELINE_SERVER)
+  println("execution Id: " + msg)
+
+  System.exit(0)
+//  PipelineContext.test(pipe)
 
 
 }

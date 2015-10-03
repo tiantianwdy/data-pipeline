@@ -50,13 +50,13 @@ object ComplexPipelineExample extends App {
   val analysisSparkNew = new SparkPipe(name = "analysisSparkNew", version = "0.0.1",
     exec = new SparkAnalysisProcNew)
 
-//  val pipeline =(csvMapper, jsonMapper, textMapper) ->: dataJoiner
+  val pipeline =(csvMapper, jsonMapper, textMapper) ->: dataJoiner
 
-  val pipeline = ((csvMapper, jsonMapper, textMapper) ->: dataJoiner) :-> (featureExtractorNew :-> analysisSparkNew,
-                                                                           featureExtractorSpark :-> analysisSpark)
+//  val pipeline = ((csvMapper, jsonMapper, textMapper) ->: dataJoiner) :-> (featureExtractorNew :-> analysisSparkNew,
+//                                                                           featureExtractorSpark :-> analysisSpark)
 
 
-  submitAllDependency(csvMapper,
+  DependencySubmit.submitAllDependency(csvMapper,
     jsonMapper,
     textMapper,
     dataJoiner,
@@ -65,7 +65,7 @@ object ComplexPipelineExample extends App {
     analysisSpark,
     analysisSparkNew)
 
-  val msg = PipelineContext.exec("ComplexPipeLine", pipeline, PipeExecutionContext.DEFAULT_PIPELINE_SERVER)
+  val msg = PipelineContext.exec("ComplexPipeLine", Seq(pipeline), PipeExecutionContext.DEFAULT_PIPELINE_SERVER)
   println("execution Id: " + msg)
 
   System.exit(0)
@@ -76,17 +76,6 @@ object ComplexPipelineExample extends App {
 //    PipelineContext.test(pipeline)
 
 
-  def submitAllDependency(pipeList: Pipe[_, _]*): Unit = {
-    pipeList.foreach { pipe => pipe match {
-      case p: MRPipe =>
-        DependencyClient.submitPipe(p.name, p.version,
-          "/home/tiantian/Dev/workspace/data-pipeline/data-pipeline-examples/target/data-pipeline-examples.jar")
-      case p: SparkPipe[_, _] =>
-        DependencyClient.submitPipe(p.name, p.version,
-          "/home/tiantian/Dev/workspace/data-pipeline/data-pipeline-examples/target/data-pipeline-examples-0.0.1.jar")
-      }
-    }
-  }
 
 }
 

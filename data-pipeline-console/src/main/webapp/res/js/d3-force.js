@@ -1,6 +1,7 @@
 
 
 var colorArray = ["white", "green", "blue", "orange", "red", "purple",  "black"]
+
 function createDAG(elem, graph) {
 
   var width = 560,
@@ -77,7 +78,7 @@ function renderWithCurveArrows(svg, force, graph){
       .attr("x", 15)
       .attr("dy", ".35em")
       .attr("class", "text")
-      .text(function(d) { return d.name + " # " + d.version; });
+      .text(function(d) { return d.name; });
 
 // add the curvy lines
   function tick() {
@@ -142,7 +143,7 @@ function renderWithLines(svg, force, graph) {
       .call(force.drag);
 
   node.append("title")
-      .text(function(d) { return d.name + "<br/>" + d.version; });
+      .text(function(d) { return d.name; });
 
   force.on("tick", function() {
     link.attr("x1", function(d) { return d.source.x; })
@@ -165,7 +166,7 @@ function renderWithLines(svg, force, graph) {
 
         div.html("name: " + d.name
                 + "<br/>" + "version: " + d.version
-                + "<br/>" + "type: " + d.pipeType
+                + "<br/>" + "type: " + d.type
                 + "<br/>" + "startTime: " + d.startTime
                 + "<br/>" + "endTime: " + d.endTime
                 + "<br/>" + "state: " + d.status)

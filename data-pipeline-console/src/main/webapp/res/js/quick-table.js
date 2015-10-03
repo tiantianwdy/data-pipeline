@@ -26,7 +26,7 @@ function addTable(tableId, headings, table_data) {
         tableBody.appendChild(tr);
         for (j = 0; j < table_data[i].length; j++) {
             var td = document.createElement('td')
-            td.appendChild(document.createTextNode(stock[i][j]));
+            td.appendChild(document.createTextNode(table_data[i][j]));
             tr.appendChild(td)
         }
     }

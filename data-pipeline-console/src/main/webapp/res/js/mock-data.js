@@ -201,22 +201,27 @@ var mockPipelineTree = [
   {
     "name": "Pipeline_ID",
     "parent": "null",
+    "group" : 0,
     "children": [
       {
         "name": "execution_1",
         "parent": "Pipeline_ID",
+        "group" : 0,
         "children": [
           {
             "name": "csvMapper#0.0.1",
-            "parent": "execution_1"
+            "parent": "execution_1",
+            "group" : 1
           },
           {
             "name": "jsonMapper#0.0.1",
-            "parent": "execution_1"
+            "parent": "execution_1",
+            "group" : 1
           },
           {
             "name": "textMapper#0.0.1",
-            "parent": "execution_1"
+            "parent": "execution_1",
+            "group" : 1
           },
           {
             "name": "dataJoiner#0.0.1",
@@ -327,3 +332,14 @@ var mockPipelineTree = [
     ]
   }
 ];
+
+
+var mockExecDAG = new Array();
+mockExecDAG[0] = new Array("1", "textMapper", "0.0.1", "None", "85.81", "Completed");
+mockExecDAG[1] = new Array("2", "jsonMapper", "0.0.1", "None", "85.81", "Running");
+mockExecDAG[2] = new Array("3", "csvMapper",  "0.0.1", "None", "85.81", "Running");
+mockExecDAG[3] = new Array("4", "dataJoiner", "0.0.1", "textMapper; jsonMapper; csvMapper", "85.81", "Waiting");
+mockExecDAG[4] = new Array("5", "featureExtractorPy", "0.0.1", "dataJoiner", "85.81", "Waiting");
+mockExecDAG[5] = new Array("6", "featureExtractorSpark", "0.0.1", "dataJoiner", "85.81", "Waiting");
+mockExecDAG[6] = new Array("7", "analysisPy", "0.0.1", "featureExtractorPy", "85.81", "Waiting");
+mockExecDAG[7] = new Array("8", "analysisSpark", "0.0.1", "featureExtractorSpark", "85.81", "Waiting");

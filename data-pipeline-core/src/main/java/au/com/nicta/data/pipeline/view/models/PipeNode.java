@@ -1,6 +1,8 @@
 package au.com.nicta.data.pipeline.view.models;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by tiantian on 24/09/15.
@@ -23,6 +25,7 @@ public class PipeNode {
 
     private Integer group;
 
+
     public PipeNode() {
 
     }
@@ -40,14 +43,14 @@ public class PipeNode {
     }
 
     public PipeNode(String name, String version, String author, String type, Date startTime, Date endTime, String status, Integer group) {
-        this.name = name;
+        this.name = name + "#" + version;
         this.version = version;
         this.author = author;
         this.type = type;
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = status;
-        this.group = group;
+        this.group = ExecutionVO.getGroup(status);
     }
 
     public String getName() {
@@ -104,5 +107,13 @@ public class PipeNode {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getGroup() {
+        return group;
+    }
+
+    public void setGroup(Integer group) {
+        this.group = group;
     }
 }

@@ -26,8 +26,8 @@ circle {
 div.tooltip {
   position: absolute;
   text-align: left;
-  width: 140px;
-  height: 120px;
+  width: 320px;
+  height: 140px;
   padding: 2px;
   font: 14px sans-serif;
   background: lightsteelblue;

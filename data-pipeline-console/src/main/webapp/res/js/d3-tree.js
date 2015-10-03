@@ -194,13 +194,14 @@ function createInteractiveTree(elem, treeData, nodeInfo, treeWidth, treeHeight, 
    function nodeColor(data){
       var color = d3.scale.category20();
       if(data.depth < 2){ //non-leave nodes
-         return data._children ? "lightsteelblue" : "#fff"
+         return data._children ? "lightsteelblue" : "#fff";
       } else { //leave node with states
          var seq = data.name.split("#");
-         var name = seq[0]
-         var version = seq[1]
-         var n = findNodeFromGraph(name, version, nodeInfo)
-         return n ? colorArray[n.group] : "white";
+         var name = seq[0];
+         var version = seq[1];
+//         var n = findNodeFromGraph(name, version, nodeInfo);
+         var n = data.group
+         return n ? colorArray[n] : "white";
       }
    }
 }
