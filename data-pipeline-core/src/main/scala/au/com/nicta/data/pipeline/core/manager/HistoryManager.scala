@@ -53,6 +53,11 @@ class HistoryManager extends Logging{
     executionTraceMap.put(eTrace.taskId, eTrace)
     log.info(eTrace.toString)
   }
+
+  def updateExecTrace(eTrace: ExecutionTrace): Unit ={
+    executionTraceMap.put(eTrace.taskId, eTrace)
+    log.info(eTrace.toString)
+  }
   
   def addPipeTrace(pTrace:PipeTrace): Unit = {
     val id = pipeId(pTrace.pipeName, pTrace.version)

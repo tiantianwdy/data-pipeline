@@ -158,6 +158,11 @@ function renderWithLines(svg, force, graph) {
 }
 
    function addToolTip(d, div){
+        var options = {
+           year: "numeric", month: "numeric", day: "numeric",
+           hour: "2-digit", minute: "2-digit", second: "2-digit"
+        };
+
         lineID = d.name;
 
         div.transition()
@@ -167,8 +172,8 @@ function renderWithLines(svg, force, graph) {
         div.html("name: " + d.name
                 + "<br/>" + "version: " + d.version
                 + "<br/>" + "type: " + d.type
-                + "<br/>" + "startTime: " + d.startTime
-                + "<br/>" + "endTime: " + d.endTime
+                + "<br/>" + "startTime: " + new Date(d.startTime).toLocaleTimeString("en-US", options)
+                + "<br/>" + "endTime: " + new Date(d.endTime).toLocaleTimeString("en-US", options)
                 + "<br/>" + "state: " + d.status)
            .style("left", (d3.event.pageX) + "px")
            .style("top", (d3.event.pageY + 10) + "px");
